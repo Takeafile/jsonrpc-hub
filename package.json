@@ -1,0 +1,28 @@
+{
+  "name": "jsonrpc-hub",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/piranna/jsonrpc-hub.git"
+  },
+  "keywords": [
+    "JsonRPC",
+    "proxy",
+    "hub",
+    "router",
+    "routing",
+    "json",
+    "rpc"
+  ],
+  "author": "Jesús Leganés-Combarro 'piranna' <piranna@gmail.com>",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/piranna/jsonrpc-hub#readme",
+  "dependencies": {
+    "async": "^2.6.1"
+  }
+}

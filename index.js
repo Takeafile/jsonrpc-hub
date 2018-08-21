@@ -64,22 +64,7 @@ module.exports = function(getId, allowBroadcast)
         // Brodcast
         if(allowBroadcast && to === null)
           return each(Object.values(sockets).filter(item => item !== socket),
-          relay.bind(data), function(error, results)
-          {
-            // This can't happen, but who knows...
-            if(error) return socket.send(error)
-
-            if(results.some(item => item instanceof Error))
-            {
-              error = new Error('There was errors delivering broadcast message')
-              error.code = 0
-              error.data = results
-            }
-            else
-              var result = results
-
-            socket.send({error, id, jsonrpc: '2.0', result})
-          })
+          relay.bind(data), resultBroadcast)
 
         // Destination is not defined, or brodcast is not allowed
         if(to == null)
@@ -89,15 +74,7 @@ module.exports = function(getId, allowBroadcast)
         else
         {
           const dest = sockets[to]
-          if(dest) return relay.call(data, dest, function(error, result)
-          {
-            // This can't happen, but who knows...
-            if(error) return socket.send(error)
-
-            result.id = id
-
-            socket.send(result)
-          })
+          if(dest) return relay.call(data, dest, resultSingle)
 
           error = {message: `Unknown destination '${to}'`}
         }
@@ -118,6 +95,32 @@ module.exports = function(getId, allowBroadcast)
       socket.send({error, id, jsonrpc: '2.0'})
     }
 
+    function resultBroadcast(error, results)
+    {
+      // This can't happen, but who knows...
+      if(error) return socket.send(error)
+
+      if(results.some(item => item instanceof Error))
+      {
+        error = new Error('There was errors delivering broadcast message')
+        error.code = 0
+        error.data = results
+      }
+      else
+        var result = results
+
+      socket.send({error, id, jsonrpc: '2.0', result})
+    }
+
+    function resultSingle(error, result)
+    {
+      // This can't happen, but who knows...
+      if(error) return socket.send(error)
+
+      result.id = id
+
+      socket.send(result)
+    }
 
     const id = await getId(socket, request)
 

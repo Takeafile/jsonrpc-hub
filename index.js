@@ -23,7 +23,7 @@ module.exports = function(getId, allowBroadcast)
 {
   const sockets = {}
 
-  return async function(socket, request)
+  return async function(socket, request, next)
   {
     const responses = {}
 
@@ -122,9 +122,19 @@ module.exports = function(getId, allowBroadcast)
       socket.send(result)
     }
 
-    const id = await getId(socket, request)
 
-    sockets[id] = socket
+    try
+    {
+      const id = await getId(socket, request)
+
+      sockets[id] = socket
+    }
+    catch(error)
+    {
+      if(next) return next(error)
+
+      throw error
+    }
 
     socket.addEventListener('close'  , onClose)
     socket.addEventListener('message', onMessage)

@@ -1,6 +1,17 @@
 const each = require('async/each')
 
 
+function filterItself(item)
+{
+  return item !== this
+}
+
+function isError(error)
+{
+  return error instanceof Error
+}
+
+
 function relay(socket, callback)
 {
   let sendId
@@ -54,7 +65,7 @@ module.exports = function(getId, allowBroadcast)
         // This can't happen, but who knows...
         if(error) return reply(error)
 
-        if(data.some(item => item instanceof Error))
+        if(data.some(isError)
         {
           error =
           {
@@ -97,7 +108,7 @@ module.exports = function(getId, allowBroadcast)
       {
         // Brodcast
         if(allowBroadcast && to === null)
-          return each(Object.values(sockets).filter(item => item !== this),
+          return each(Object.values(sockets).filter(filterItself, this),
           relay.bind(data), resultBroadcast)
 
         // Destination is not defined, or brodcast is not allowed

@@ -31,8 +31,9 @@ function relay(socket, callback)
     socket._responses[sendId] = callback
   }
 
-  // Overwrite message ID with the new one
+  // Overwrite message ID with the new one and reset destination
   this.id = sendId
+  delete this.to
 
   socket.send(JSON.stringify(this))
 }

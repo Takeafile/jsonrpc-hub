@@ -13,9 +13,10 @@ function relay(socket, callback)
     socket._responses[sendId] = callback
   }
 
+  // Overwrite message ID with the new one
   this.id = sendId
 
-  socket.send(this)
+  socket.send(JSON.stringify(this))
 }
 
 
@@ -43,83 +44,79 @@ module.exports = function(getId, allowBroadcast)
 
     function onMessage({data})
     {
-      let error
+      const reply = (error, result) =>
+      {
+        this.send(JSON.stringify({error, id, jsonrpc: '2.0', result}))
+      }
+
+      function resultBroadcast(error, data)
+      {
+        // This can't happen, but who knows...
+        if(error) return reply(error)
+
+        if(data.some(item => item instanceof Error))
+        {
+          error =
+          {
+            code: -32400,
+            data,
+            message: 'There were errors delivering broadcast message'
+          }
+
+          data = null
+        }
+
+        reply(error, data)
+      }
+
+      function resultSingle(error, result)
+      {
+        // This can't happen, but who knows...
+        if(error) return reply(error)
+
+        result.id = id
+
+        reply(null, result)
+      }
 
       try {
         data = JSON.parse(data)
       }
       catch(e) {
-        error = {code: -32700, message: 'Invalid JSON'}
+        return reply({code: -32700, message: 'Invalid JSON'})
       }
 
       // `to` field on requests is a custom extension to JsonRPC specification
       const {id, jsonrpc, method, to} = data
 
       if(jsonrpc !== '2.0')
-        error = {code: -32600, message: `Invalid JsonRPC version '${jsonrpc}`}
+        return reply({code: -32600, message: `Invalid JsonRPC version '${jsonrpc}`})
 
       // Request
-      else if(method)
+      if(method)
       {
         // Brodcast
         if(allowBroadcast && to === null)
-          return each(Object.values(sockets).filter(item => item !== socket),
+          return each(Object.values(sockets).filter(item => item !== this),
           relay.bind(data), resultBroadcast)
 
         // Destination is not defined, or brodcast is not allowed
         if(to == null)
-          error = {code: -32602, message: 'Destination is required'}
+          return reply({code: -32602, message: 'Destination is required'})
 
         // Single destination
-        else
-        {
-          const dest = sockets[to]
-          if(dest) return relay.call(data, dest, resultSingle)
+        const dest = sockets[to]
+        if(dest) return relay.call(data, dest, resultSingle)
 
-          error = {message: `Unknown destination '${to}'`}
-        }
+        return reply({code: -32300, message: `Unknown destination '${to}'`})
       }
 
       // Response
-      else
-      {
-        const response = responses[id]
-        if(response)
-        {
-          delete responses[id]
+      const response = responses[id]
+      if(!response) return
 
-          return response(null, data)
-        }
-      }
-
-      socket.send({error, id, jsonrpc: '2.0'})
-    }
-
-    function resultBroadcast(error, results)
-    {
-      // This can't happen, but who knows...
-      if(error) return socket.send(error)
-
-      if(results.some(item => item instanceof Error))
-      {
-        error = new Error('There was errors delivering broadcast message')
-        error.code = 0
-        error.data = results
-      }
-      else
-        var result = results
-
-      socket.send({error, id, jsonrpc: '2.0', result})
-    }
-
-    function resultSingle(error, result)
-    {
-      // This can't happen, but who knows...
-      if(error) return socket.send(error)
-
-      result.id = id
-
-      socket.send(result)
+      delete responses[id]
+      response(null, data)
     }
 
 

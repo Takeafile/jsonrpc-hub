@@ -60,32 +60,13 @@ module.exports = function(getId, allowBroadcast)
 
       function resultBroadcast(error, data)
       {
-        // This can't happen, but who knows...
-        if(error) return reply(error)
+        if(error || !data.some(isError)) return reply(error, data)
 
-        if(data.some(isError)
-        {
-          error =
-          {
-            code: -32400,
-            data,
-            message: 'There were errors delivering broadcast message'
-          }
-
-          data = null
-        }
-
-        reply(error, data)
-      }
-
-      function resultSingle(error, result)
-      {
-        // This can't happen, but who knows...
-        if(error) return reply(error)
-
-        result.id = id
-
-        reply(null, result)
+        reply({
+          code: -32400,
+          data,
+          message: 'There were errors delivering broadcast message'
+        })
       }
 
       try {
@@ -96,7 +77,7 @@ module.exports = function(getId, allowBroadcast)
       }
 
       // `to` field on requests is a custom extension to JsonRPC specification
-      const {id, jsonrpc, method, to} = data
+      const {error, id, jsonrpc, method, result, to} = data
 
       if(jsonrpc !== '2.0')
         return reply({code: -32600, message: `Invalid JsonRPC version '${jsonrpc}`})
@@ -115,7 +96,7 @@ module.exports = function(getId, allowBroadcast)
 
         // Single destination
         const dest = sockets[to]
-        if(dest) return relay.call(data, dest, resultSingle)
+        if(dest) return relay.call(data, dest, reply)
 
         return reply({code: -32300, message: `Unknown destination '${to}'`})
       }
@@ -125,7 +106,7 @@ module.exports = function(getId, allowBroadcast)
       if(!response) return
 
       delete responses[id]
-      response(null, data)
+      response(error, result)
     }
 
 

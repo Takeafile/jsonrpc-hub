@@ -1,6 +1,13 @@
 const each = require('async/each')
 
 
+function defaultGetId({upgradeReq})
+{
+  if(upgradeReq == null) throw new Error('`upgradeReq` is not defined')
+
+  return upgradeReq
+}
+
 function filterItself(item)
 {
   return item !== this
@@ -31,7 +38,7 @@ function relay(socket, callback)
 }
 
 
-module.exports = function(getId, allowBroadcast)
+module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 {
   const sockets = {}
 

@@ -47,9 +47,7 @@ module.exports = function(getId, allowBroadcast)
       // one that have just clossed
       Object.values(responses).forEach(function(callback)
       {
-        const error = {code: -32300, message: 'Destination connection clossed'}
-
-        callback(null, {error, id, jsonrpc: '2.0'})
+        callback({code: -32300, message: 'Destination connection clossed'})
       })
     }
 

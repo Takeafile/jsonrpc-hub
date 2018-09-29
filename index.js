@@ -19,21 +19,31 @@ function isError(error)
 
 function relay(socket, callback)
 {
+  const {data, sender} = this
+
   let sendId
 
   // Don't send `id` for incoming notifications
-  if(this.id !== undefined)
+  if(data.id !== undefined)
   {
     sendId = socket._idCounter++
 
-    socket._responses[sendId] = callback
+    socket._responses[sendId] = {callback, sender}
   }
 
   // Overwrite message ID with the new one and reset destination
-  this.id = sendId
-  delete this.to
+  data.id = sendId
+  delete data.to
 
-  socket.send(JSON.stringify(this))
+  socket.send(JSON.stringify(data))
+}
+
+function removePendingResponses({_responses})
+{
+  Object.entries(_responses).forEach(function([id, {sender}])
+  {
+    if(sender === this) delete _responses[id]
+  }, this)
 }
 
 

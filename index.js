@@ -1,11 +1,9 @@
 const each = require('async/each')
 
 
-function defaultGetId({upgradeReq})
+function defaultGetId(socket, {url})
 {
-  if(upgradeReq == null) throw new Error('`upgradeReq` is not defined')
-
-  return upgradeReq
+  return url
 }
 
 function filterItself(item)

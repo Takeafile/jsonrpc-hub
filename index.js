@@ -54,6 +54,11 @@ function removePendingResponses({_responses})
   }, this)
 }
 
+function responseDestinationClossed({callback})
+{
+  callback({code: -32300, message: 'Destination connection clossed'})
+}
+
 
 /**
  * Conections factory
@@ -77,10 +82,7 @@ module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 
         // Response with an error to the connections waiting an answer from the
         // one that have just clossed
-        Object.values(responses).forEach(function({callback})
-        {
-          callback({code: -32300, message: 'Destination connection clossed'})
-        })
+        Object.values(responses).forEach(responseDestinationClossed)
 
         // Remove pending responses from other connections to this one, since
         // they will not be delivered

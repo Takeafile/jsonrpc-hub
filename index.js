@@ -1,6 +1,9 @@
 const each = require('async/each')
 
 
+/**
+ * Default function to get connection ID, using the Request URL
+ */
 function defaultGetId(socket, {url})
 {
   return url
@@ -17,6 +20,9 @@ function isError(error)
 }
 
 
+/**
+ * Send `data` to the provided `socket` and call `callback` on responses
+ */
 function relay(socket, callback)
 {
   const {data, sender} = this
@@ -28,6 +34,7 @@ function relay(socket, callback)
   {
     sendId = socket._idCounter++
 
+    // Store the callback and the sender to call them on the matching response
     socket._responses[sendId] = {callback, sender}
   }
 
@@ -35,6 +42,7 @@ function relay(socket, callback)
   data.id = sendId
   delete data.to
 
+  // Send the data to its destination
   socket.send(JSON.stringify(data))
 }
 
@@ -47,6 +55,9 @@ function removePendingResponses({_responses})
 }
 
 
+/**
+ * Conections factory
+ */
 module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 {
   const sockets = {}

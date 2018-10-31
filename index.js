@@ -142,7 +142,8 @@ module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 
         // Response
         const response = responses[id]
-        if(!response) return
+        if(!response)
+          return console.warn(`Received unexpected response '${id}'`)
 
         delete responses[id]
         response.callback(error, result)

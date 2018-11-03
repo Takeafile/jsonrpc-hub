@@ -25,7 +25,7 @@ function isError(error)
  */
 function relay(socket, callback)
 {
-  const {data, sender} = this
+  const {data, sender, timeout} = this
 
   let sendId
 
@@ -34,8 +34,16 @@ function relay(socket, callback)
   {
     sendId = socket._idCounter++
 
-    // Store the callback and the sender to call them on the matching response
-    socket._responses[sendId] = {callback, sender}
+    if(timeout)
+      response.timeout = setTimeout(
+        doResponse.bind(socket),
+        timeout,
+        sendId,
+        {code: -32300, message: 'Timeout waiting response from destination'}
+      )
+
+    // Store the callback, sender and timeout to call on the matching response
+    socket._responses[sendId] = {callback, sender, timeout}
   }
 
   // Overwrite message ID with the new one and reset destination
@@ -54,9 +62,24 @@ function removePendingResponses({_responses})
   }, this)
 }
 
-function responseDestinationClossed({callback})
+function doResponse(id, error, data)
 {
-  callback({code: -32300, message: 'Destination connection clossed'})
+  const {_responses} = this
+
+  const response = _responses[id]
+  if(!response) return console.warn(`Received unexpected response '${id}'`)
+
+  delete _responses[id]
+
+  clearTimeout(response.timeout)
+  response.callback(error, data)
+}
+
+function responseDestinationClossed(id)
+{
+  const error = {code: -32300, message: 'Destination connection clossed'}
+
+  doResponse.call(this, id, error)
 }
 
 
@@ -82,7 +105,7 @@ module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 
         // Response with an error to the connections waiting an answer from the
         // one that have just clossed
-        Object.values(responses).forEach(responseDestinationClossed)
+        Object.keys(responses).forEach(responseDestinationClossed, this)
 
         // Remove pending responses from other connections to this one, since
         // they will not be delivered
@@ -126,7 +149,8 @@ module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
           // Brodcast
           if(allowBroadcast && to === null)
             return each(Object.values(sockets).filter(filterItself, this),
-                        relay.bind({data, sender: this}), resultBroadcast)
+                        relay.bind({data, sender: this, timeout}),
+                        resultBroadcast)
 
           // Destination is not defined, or brodcast is not allowed
           if(to == null)
@@ -134,19 +158,14 @@ module.exports = function({allowBroadcast, getId = defaultGetId, timeout} = {})
 
           // Single destination
           const dest = sockets[to.slice(to.indexOf('/'))]
-          if(dest) return relay.call({data, sender: this}, dest, reply)
+          if(dest) return relay.call({data, sender: this, timeout}, dest, reply)
 
           // Unknown destination
           return reply({code: -32300, message: `Unknown destination '${to}'`})
         }
 
         // Response
-        const response = responses[id]
-        if(!response)
-          return console.warn(`Received unexpected response '${id}'`)
-
-        delete responses[id]
-        response.callback(error, result)
+        doResponse.call(this, id, error, result)
       }
 
 

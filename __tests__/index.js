@@ -60,11 +60,11 @@ test('basic', function(done)
   const hub = jsonrpcHub()
 
   Promise.all([
-    hub(half12),
-    hub(half21)
+    hub(half12, {url: '1'}),
+    hub(half21, {url: '2'})
   ])
   .then(function()
   {
-    half11.send(JSON.stringify({id: 123, jsonrpc: '2.0', method: 'foo', to: 2}))
+    half11.send(JSON.stringify({id: 123, jsonrpc: '2.0', method: 'foo', to: '2'}))
   })
 })

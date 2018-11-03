@@ -1,7 +1,7 @@
 {
   "name": "jsonrpc-hub",
   "version": "0.0.0",
-  "description": "",
+  "description": "Relay bidirectional JsonRPC messages between clients",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --notify"

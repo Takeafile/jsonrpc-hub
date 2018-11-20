@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/piranna/jsonrpc-hub.git"
+    "url": "git+ssh://git@github.com/Takeafile/jsonrpc-hub.git"
   },
   "keywords": [
     "JsonRPC",
@@ -23,7 +23,7 @@
   ],
   "author": "Jesús Leganés-Combarro 'piranna' <piranna@gmail.com>",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/piranna/jsonrpc-hub#readme",
+  "homepage": "https://github.com/Takeafile/jsonrpc-hub#readme",
   "dependencies": {
     "async": "^2.6.1",
     "unify-config": "^0.4.0",

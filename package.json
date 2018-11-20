@@ -5,6 +5,7 @@
   "main": "index.js",
   "bin": "server.js",
   "scripts": {
+    "coverage": "npm test -- --coverageReporters=text-lcov | coveralls",
     "test": "jest --coverage --notify"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "ws": "^6.1.0"
   },
   "devDependencies": {
+    "coveralls": "^3.0.2",
     "jest": "^23.6.0"
   },
   "config": {

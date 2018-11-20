@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/Takeafile/jsonrpc-hub.svg?branch=master)](https://travis-ci.org/Takeafile/jsonrpc-hub)
+[![Coverage Status](https://coveralls.io/repos/github/Takeafile/jsonrpc-hub/badge.svg?branch=master)](https://coveralls.io/github/Takeafile/jsonrpc-hub?branch=master)
+
 # JsonRPC hub
 
 This server allow to relay bidirectional JsonRPC messages between clients

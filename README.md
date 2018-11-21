@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/Takeafile/jsonrpc-hub.svg?branch=master)](https://travis-ci.org/Takeafile/jsonrpc-hub)
 [![Coverage Status](https://coveralls.io/repos/github/Takeafile/jsonrpc-hub/badge.svg?branch=master)](https://coveralls.io/github/Takeafile/jsonrpc-hub?branch=master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Takeafile/jsonrpc-hub.svg)](https://greenkeeper.io/)
 
 # JsonRPC hub
 

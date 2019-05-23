@@ -26,7 +26,7 @@
   "homepage": "https://github.com/Takeafile/jsonrpc-hub#readme",
   "dependencies": {
     "async": "^2.6.1",
-    "unify-config": "^0.4.0",
+    "unify-config": "^0.5.1",
     "ws": "^6.1.2"
   },
   "devDependencies": {

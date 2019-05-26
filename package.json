@@ -25,7 +25,7 @@
   "license": "ISC",
   "homepage": "https://github.com/Takeafile/jsonrpc-hub#readme",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.0.1",
     "unify-config": "^0.4.0",
     "ws": "^6.1.2"
   },

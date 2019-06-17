@@ -27,7 +27,7 @@
   "dependencies": {
     "async": "^2.6.1",
     "unify-config": "^0.4.0",
-    "ws": "^6.1.2"
+    "ws": "^7.0.1"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
